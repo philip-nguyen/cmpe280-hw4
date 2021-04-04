@@ -2,7 +2,7 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="style.css">
-        
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     </head>
     <body>
         <h1>Health Camp SPA</h1>
@@ -52,10 +52,12 @@
                         <input class='b' type='text' id='other' placeholder="Ex. Conditions">
                     </div>
                     
-                    <button id="demoButton" onclick="saveDemographics()">Save</button>
+                    <input type="submit" id="demoButton" value="Save">
                 </div>
                 
             </form>
+
+            
 
             <form class="wrapper" id="vitals">
                 <div class="bow row">
@@ -88,14 +90,11 @@
                     </div>
                     
                     
-                    <button onclick="saveVitals()">Save</button>
+                    <input type="submit" id="demoButton" value="Save">
                 </div>
                 
             </form>
-            <script>
-                var vitals = document.getElementById("vitals");
-                vitals.style.display = "none";
-            </script>
+            
             <table id="report">
                 <tr>
                     <th>Name</th>
@@ -112,6 +111,83 @@
                 vitals.style.display = "none";
                 var report = document.getElementById("report");
                 report.style.display = "none";
+            </script>
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+            <script>
+                $(document).ready(function(){
+                    $("#demographics").submit(function(e){
+                        e.preventDefault();
+                        console.log("demo button clicked!");
+                        ajaxDemographicSubmit();
+                    });
+
+                    $("#vitals").submit(function(e){
+                        e.preventDefault();
+                        console.log("vitals button clicked!");
+                        ajaxVitalsSubmit();
+                    })
+
+                    // submit the demographics form
+                    function ajaxDemographicSubmit() {
+                        // Prepare form data
+                        var formData = {
+                            fname: $("#fname").val(),
+                            lname: $("#lname").val(),
+                            gender: $("#gender").val(),
+                            age: $("#age").val(),
+                            notes: $("#other").val(),
+                            photo: $("#photo") ? $("#photo").val().substring(12) : ''
+                        };
+                        console.log(formData);
+                        // DO POST
+                        $.ajax({
+                                type: "POST",
+                                contentType: "application/json",
+                                url: window.location,
+                                data: JSON.stringify(formData),
+                                dataType: 'json',
+                                success: function(id) {
+                                    console.log("Response ID: ", id);
+                                    sessionStorage.setItem('curId', id);
+                                    // hide the demographics form and show vitals form
+                                    var demos = document.getElementById("demographics");
+                                    var vitals = document.getElementById("vitals");
+                                    demos.style.display = "none";
+                                    vitals.style.display = "block";
+                                },
+                                error: function(e) {
+                                    alert("error!");
+                                    console.log("ERROR: ", e);
+                                }
+                        });
+                    }
+
+                    function ajaxVitalsSubmit() {
+                        var formData = {
+                            medications: $("#medications").val(),
+                            notes: $("#notes").val(),
+                            id: sessionStorage.getItem('curId')
+                        }
+                        console.log("vitals info: ", formData);
+
+                        $.ajax({
+                            type: "POST",
+                            contentType: "application/json",
+                            url: window.location,
+                            data: JSON.stringify(formData),
+                            dataType: 'json',
+                            success: function(data) {
+                                console.log("MySQL data: ", data);
+                            },
+                            error: function(e) {
+                                alert("Error in vitals submission!");
+                                console.log("ERROR: ", e);
+                            }
+                        })
+                    }
+
+
+                });
             </script>
         </div>
     </body>
