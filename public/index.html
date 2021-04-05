@@ -96,14 +96,15 @@
             </form>
             
             <table id="report">
-                <tr>
+                <thead>
                     <th>Name</th>
                     <th>Age</th>
                     <th>Gender</th>
                     <th>Photo</th>
                     <th>Medications</th>
                     <th>Notes</th>
-                </tr>
+                </thead>
+                <tbody></tbody>
             </table>
             <script>
                 // make things non visible
@@ -177,7 +178,32 @@
                             data: JSON.stringify(formData),
                             dataType: 'json',
                             success: function(data) {
-                                console.log("MySQL data: ", data);
+                                // console.log("MySQL data: ", data);
+                                // show report and hide vitals form
+                                var report = document.getElementById("report");
+                                var vitals = document.getElementById("vitals");
+                                report.style.display = "block";
+                                vitals.style.display = "none";
+
+                                var length = data.length;
+                                for(var i = 0; i < length; i++) {
+                                    var name = data[i].name;
+                                    var age = data[i].age;
+                                    var gender = data[i].gender;
+                                    var photo = data[i].photo;
+                                    var medications = data[i].medications;
+                                    var notes = data[i].notes;
+
+                                    var tr_str = "<tr>" + 
+                                        "<td>" + name + "</td>" +
+                                        "<td>" + age + "</td>" +
+                                        "<td>" + gender + "</td>" +
+                                        "<td>" + photo + "</td>" +
+                                        "<td>" + medications + "</td>" +
+                                        "<td>" + notes + "</td>" +
+                                        "</tr>";
+                                    $("#report tbody").append(tr_str);
+                                }
                             },
                             error: function(e) {
                                 alert("Error in vitals submission!");

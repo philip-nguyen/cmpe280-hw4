@@ -69,6 +69,7 @@ app.post("", jsonParser, function(req, res) {
         connection.query('SELECT * FROM Patients', function(err, rows, fields) {
             if (err) throw err;
             var data = [];
+            // console.log(rows);
             for(i = 0; i < rows; i++) {
                 data.push(rows[i].name);
                 data.push(rows[i].age);
@@ -77,7 +78,7 @@ app.post("", jsonParser, function(req, res) {
                 data.push(rows[i].medications);
                 data.push(rows[i].notes);
             }
-            res.json(JSON.stringify(data));
+            res.json(rows);
         });
     }
     
