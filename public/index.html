@@ -20,8 +20,6 @@
                     <aside>
                         <label for="photo">Photo:</label>
                         <input type="file" id="photo">
-                        <!-- <button id="capture">Capture</button> -->
-                        <!-- <canvas id="canvas" width=320 height=240></canvas> -->
                         
                     </aside>
                     
@@ -116,12 +114,14 @@
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
             <script>
                 $(document).ready(function(){
+                    // ajax submit listener for demographics form
                     $("#demographics").submit(function(e){
                         e.preventDefault();
                         console.log("demo button clicked!");
                         ajaxDemographicSubmit();
                     });
 
+                    // ajax submit listener for vitals form
                     $("#vitals").submit(function(e){
                         e.preventDefault();
                         console.log("vitals button clicked!");
@@ -139,7 +139,7 @@
                             notes: $("#other").val(),
                             photo: $("#photo") ? $("#photo").val().substring(12) : ''
                         };
-                        console.log(formData);
+                        
                         // DO POST
                         $.ajax({
                                 type: "POST",
@@ -148,8 +148,9 @@
                                 data: JSON.stringify(formData),
                                 dataType: 'json',
                                 success: function(id) {
-                                    console.log("Response ID: ", id);
+                                    // store ID of newly added row to session Storage
                                     sessionStorage.setItem('curId', id);
+                                    
                                     // hide the demographics form and show vitals form
                                     var demos = document.getElementById("demographics");
                                     var vitals = document.getElementById("vitals");
@@ -169,7 +170,7 @@
                             notes: $("#notes").val(),
                             id: sessionStorage.getItem('curId')
                         }
-                        console.log("vitals info: ", formData);
+                        
 
                         $.ajax({
                             type: "POST",
@@ -178,13 +179,14 @@
                             data: JSON.stringify(formData),
                             dataType: 'json',
                             success: function(data) {
-                                // console.log("MySQL data: ", data);
+                                
                                 // show report and hide vitals form
                                 var report = document.getElementById("report");
                                 var vitals = document.getElementById("vitals");
                                 report.style.display = "block";
                                 vitals.style.display = "none";
 
+                                // get the length of the data response
                                 var length = data.length;
                                 for(var i = 0; i < length; i++) {
                                     var name = data[i].name;
@@ -194,6 +196,7 @@
                                     var medications = data[i].medications;
                                     var notes = data[i].notes;
 
+                                    // add to table body
                                     var tr_str = "<tr>" + 
                                         "<td>" + name + "</td>" +
                                         "<td>" + age + "</td>" +

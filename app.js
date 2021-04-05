@@ -22,7 +22,7 @@ app.use(express.static("public"));
 //set the path of the jquery file to be used from the node_module jquery package  
 app.use('/jquery',express.static(path.join(__dirname+'/node_modules/jquery/dist/')));  
 
-// mysql connection
+// MySQL connection
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -52,9 +52,7 @@ app.post("", jsonParser, function(req, res) {
         connection.query('SELECT id FROM Patients WHERE name = '+quoteString(name)+' \
             AND gender = '+quoteString(gender)+' AND age = '+quoteString(age), 
             (err, rows) => {
-                console.log("ID: ", rows[0].id);
-                
-                //sessionStorage.setItem('curId', results.rows[0].id);
+                // return the id of the newest row
                 res.json(rows[0].id);
             });
     }
@@ -63,9 +61,11 @@ app.post("", jsonParser, function(req, res) {
         var meds = req.body.medications;
         var notes = req.body.notes;
         var id = req.body.id;
+        // update the new row with meds and notes
         connection.query('UPDATE Patients SET medications=?, notes=? WHERE id = ?',
                         [meds, notes, id]);
 
+        // database read
         connection.query('SELECT * FROM Patients', function(err, rows, fields) {
             if (err) throw err;
             var data = [];
@@ -78,26 +78,11 @@ app.post("", jsonParser, function(req, res) {
                 data.push(rows[i].medications);
                 data.push(rows[i].notes);
             }
+            // return the rows back to client-side
             res.json(rows);
         });
     }
     
-});
-
-
-
-
-
-app.post('/demo', function(req, res) {
-    event.preventDefault();
-    
-    console.log('req.body');
-    console.log(req.body);
-    res.write('You sent the name "' + req.body.name+'".\n');
-    res.write('You sent the Email "' + req.body.email+'".\n');
-    res.write('You sent the City "' + req.body.city+'".\n');
-    res.write('You sent the Pincode "' + req.body.pincode+'".\n');
-    res.end()
 });
 
 app.listen(8000);
